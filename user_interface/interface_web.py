@@ -1,4 +1,4 @@
-# user_interface/web_interface.py
+# user_interface/interface_web.py
 
 import sys
 import os
@@ -12,8 +12,12 @@ from analysis_engine.rule_management import load_rules
 
 app = Flask(__name__)
 
+# Set the template directory explicitly
+template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
+app.template_folder = template_dir
+
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
 @app.route('/analyze', methods=['POST'])
@@ -36,4 +40,4 @@ def analyze_code():
     return jsonify({'vulnerabilities': vulnerabilities, 'quality_issues': quality_issues})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)  # Change 5001 to another available port
