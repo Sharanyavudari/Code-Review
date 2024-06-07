@@ -1,0 +1,60 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Analysis Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Code Analysis Tool</h1>
+    <form id="codeForm">
+        <textarea id="code" name="code" placeholder="Enter Python code here..." required></textarea>
+        <button type="submit">Analyze</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#codeForm').submit(function(event) {
+                event.preventDefault();
+                var code = $('#code').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/analyze',
+                    data: {code: code},
+                    success: function(data) {
+                        var resultsDiv = $('#results');
+                        resultsDiv.empty();
+                        if (data.error) {
+                            resultsDiv.text('Error: ' + data.error);
+                        } else {
+                            if (data.vulnerabilities.length > 0) {
+                                resultsDiv.append('<h2>Vulnerabilities detected:</h2>');
+                                $.each(data.vulnerabilities, function(index, vulnerability) {
+                                    resultsDiv.append('<p>' + vulnerability + '</p>');
+                                });
+                            } else {
+                                resultsDiv.append('<p>No vulnerabilities detected.</p>');
+                            }
+
+                            if (data.quality_issues.length > 0) {
+                                resultsDiv.append('<h2>Quality issues detected:</h2>');
+                                $.each(data.quality_issues, function(index, issue) {
+                                    resultsDiv.append('<p>' + issue + '</p>');
+                                });
+                            } else {
+                                resultsDiv.append('<p>No quality issues detected.</p>');
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
